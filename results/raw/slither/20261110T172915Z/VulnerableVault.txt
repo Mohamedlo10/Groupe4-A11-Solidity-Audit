@@ -1,0 +1,30 @@
+
+Detector: reentrancy-eth
+Reentrancy in VulnerableVault.retirer() (contracts/vulnerable/VulnerableVault.sol#14-23):
+	External calls:
+	- (ok,None) = msg.sender.call{value: montant}() (contracts/vulnerable/VulnerableVault.sol#19)
+	State variables written after the call(s):
+	- soldes[msg.sender] = 0 (contracts/vulnerable/VulnerableVault.sol#22)
+	VulnerableVault.soldes (contracts/vulnerable/VulnerableVault.sol#8) can be used in cross function reentrancies:
+	- VulnerableVault.deposer() (contracts/vulnerable/VulnerableVault.sol#10-12)
+	- VulnerableVault.retirer() (contracts/vulnerable/VulnerableVault.sol#14-23)
+	- VulnerableVault.soldes (contracts/vulnerable/VulnerableVault.sol#8)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-1
+
+Detector: solc-version
+Version constraint ^0.8.20 contains known severe issues (https://solidity.readthedocs.io/en/latest/bugs.html)
+	- VerbatimInvalidDeduplication
+	- FullInlinerNonExpressionSplitArgumentEvaluationOrder
+	- MissingSideEffectsOnSelectorAccess.
+It is used by:
+	- ^0.8.20 (contracts/vulnerable/VulnerableVault.sol#2)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Detector: low-level-calls
+Low level call in VulnerableVault.retirer() (contracts/vulnerable/VulnerableVault.sol#14-23):
+	- (ok,None) = msg.sender.call{value: montant}() (contracts/vulnerable/VulnerableVault.sol#19)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+contracts/vulnerable/VulnerableVault.sol analyzed (1 contracts with 102 detectors), 3 result(s) found
+Multiple frameworks detected: solc, Solc-json. Using solc (highest priority). Use --compile-force-framework to override.
+'solc --version' running
+'solc @openzeppelin/=node_modules/@openzeppelin/ contracts/vulnerable/VulnerableVault.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes --allow-paths .,/Users/macbookair/Desktop/DIC3-INFO/Cryptographie et technologies blockchain/Groupe4-A11-Solidity-Audit/contracts/vulnerable' running

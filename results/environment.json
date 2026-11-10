@@ -1,6 +1,6 @@
 {
-  "date_utc": "2026-11-10T17:21:31Z",
-  "git_commit": "aucun",
+  "date_utc": "2026-11-10T17:30:53Z",
+  "git_commit": "17cbc94",
   "os": "macOS 26.3.1",
   "arch": "arm64",
   "node": "v24.10.0",
@@ -8,11 +8,11 @@
   "git": "git version 2.50.1 (Apple Git-155)",
   "hardhat": "3.21.2",
   "solc_hardhat_config": "0.8.28",
-  "python3": "Python 3.14.6",
+  "python3": "Python 3.15.2",
   "brew": "Homebrew 7.0.12",
   "docker": "Docker version 28.5.1, build e180ab8",
-  "slither": "absent",
-  "solc_select_current": "absent",
+  "slither": "0.11.6",
+  "solc_select_current": "solc, the solidity compiler commandline interface",
   "myth": "absent",
   "echidna": "absent"
 }

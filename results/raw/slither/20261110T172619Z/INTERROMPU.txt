@@ -1,0 +1,1 @@
+Exécution interrompue le 10/11/2026 vers 17:26 UTC (dossier du dépôt déplacé pendant l'analyse). Sortie incomplète, sans meta.jsonl : ne pas l'utiliser pour les résultats.

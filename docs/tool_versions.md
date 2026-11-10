@@ -51,7 +51,13 @@ npx hardhat test
 
 | Outil | Version | Méthode d'installation | Date |
 |---|---|---|---|
-| Slither | | | |
-| solc-select | | | |
-| Mythril | | | |
-| Echidna | | | |
+| Slither | 0.11.6 | Homebrew (`brew install slither-analyzer`, bouteille arm64) | 10/11/2026 |
+| solc-select | 1.2.0 | Homebrew (`brew install solc-select`) ; `solc-select install 0.8.28 && solc-select use 0.8.28` | 10/11/2026 |
+| solc (pour Slither) | 0.8.28+commit.7893614a.Darwin.appleclang | solc-select | 10/11/2026 |
+| Mythril | — | prévu : image Docker (compatibilité arm64 à vérifier) | — |
+| Echidna | — | prévu : Homebrew 2.4.0 | — |
+
+Remarques :
+- `brew install slither-analyzer` a aussi installé **Python 3.15.2** (dépendance Homebrew). Le `python3` du système reste 3.14.6.
+- Slither 0.11.6 analyse le projet Hardhat 3 directement (`slither .`), sans configuration supplémentaire.
+- Le dépôt a été déplacé le 10/11/2026 dans `Cryptographie et technologies blockchain/Groupe4-A11-Solidity-Audit` (le chemin contient des espaces). Les tests et Slither ont été relancés depuis ce nouveau chemin avec succès.
