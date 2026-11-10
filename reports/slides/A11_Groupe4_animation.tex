@@ -1,0 +1,285 @@
+% Groupe 4 - A11 : Outils d'analyse de contrats Solidity
+% Support d'animation construit sur la structure du gabarit commun du module
+% (page de titre + 11 diapositives : Contexte, Mécanisme, État de l'art, Démonstration, Conclusion).
+% Compilation : tectonic A11_Groupe4_animation.tex   (ou xelatex / Overleaf avec XeLaTeX)
+\documentclass[11pt,aspectratio=169]{beamer}
+
+\usepackage[french]{babel}
+\usetheme[progressbar=frametitle, numbering=fraction, sectionpage=progressbar]{metropolis}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta, positioning, babel}
+\usepackage[most]{tcolorbox}
+\usepackage{booktabs, tabularx, array}
+\usepackage{listings}
+
+% ---------- Couleurs du gabarit ----------
+\definecolor{espblue}{HTML}{0B3C6E}
+\definecolor{esporange}{HTML}{D9822B}
+\definecolor{espgreen}{HTML}{2E7D4F}
+\definecolor{espred}{HTML}{8E1B1B}
+\definecolor{espgray}{HTML}{6B6B6B}
+
+\setbeamercolor{frametitle}{bg=espblue, fg=white}
+\setbeamercolor{progress bar}{fg=esporange, bg=espblue}
+\setbeamercolor{progress bar in section page}{fg=esporange, bg=black!20}
+\setbeamercolor{title separator}{fg=esporange}
+\setbeamercolor{normal text}{fg=black!85, bg=white}
+\setbeamercolor{alerted text}{fg=esporange}
+\setbeamerfont{frametitle}{size=\Large, series=\bfseries}
+\setbeamertemplate{itemize item}{\small$\blacksquare$}
+\setbeamertemplate{frame footer}{%
+  \raisebox{-0.35ex}{\includegraphics[height=1.9ex]{img/logo-ucad.png}}\,%
+  Groupe 4 \;·\; ESP-UCAD / LITA \;·\; A11 --- Analyse de contrats Solidity}
+
+% ---------- Blocs colorés du gabarit ----------
+\newtcolorbox{bloc}[2]{enhanced, colback=#1!6, colframe=#1, coltitle=white,
+  fonttitle=\bfseries\small, title={#2}, boxrule=0.6pt, arc=1.2mm,
+  left=2mm, right=2mm, top=1mm, bottom=1mm}
+
+% ---------- Code Solidity ----------
+\lstdefinelanguage{Solidity}{
+  morekeywords={function, external, payable, require, uint, bool, mapping, address, contract, pragma, solidity, return, public},
+  sensitive=true, morecomment=[l]{//}, morestring=[b]"}
+\lstset{language=Solidity, basicstyle=\ttfamily\fontsize{7}{8.2}\selectfont, keywordstyle=\color{espblue}\bfseries,
+  commentstyle=\color{espred}, stringstyle=\color{espgreen}, columns=fullflexible, keepspaces=true,
+  frame=single, rulecolor=\color{black!15}, backgroundcolor=\color{black!3}, xleftmargin=2pt}
+
+% ---------- Références (clés en gras, comme dans le gabarit) ----------
+\newcommand{\refcite}[1]{\textbf{[#1]}}
+\newcommand{\refent}[2]{\par\noindent\hangindent=2.2cm\hangafter=1%
+  \makebox[2.2cm][l]{\textbf{[#1]}}#2\par\vspace{2pt}}
+\urlstyle{same}
+
+% ---------- Personnages (Alice, Modou) ----------
+\newcommand{\personne}[3]{%
+  \begin{scope}[shift={#1}]
+    \fill[#2] (0,0.36) circle (0.13);
+    \fill[#2] (-0.22,0) arc[start angle=180, end angle=0, radius=0.22] -- cycle;
+    \node[below, font=\scriptsize\bfseries] at (0,0) {#3};
+  \end{scope}}
+
+\title{A11 --- \emph{Outils d'analyse de contrats Solidity : que détectent-ils vraiment ?}}
+\subtitle{Animation --- Cryptographie \& Technologies Blockchain}
+\author{Mohamed LO \quad Ahmadoul Khadim TOURE \quad Amadou Tidiane KANE}
+\date{Séance S5 --- vendredi 13 novembre 2026}
+\institute{École Supérieure Polytechnique, UCAD --- Laboratoire LITA\\[2pt]
+  Discutants : groupe 6 \quad Rapporteurs : groupe 7}
+
+\begin{document}
+
+% =====================================================================
+\begin{frame}[plain, noframenumbering]
+  \titlepage
+  \begin{tikzpicture}[remember picture, overlay]
+    \node[anchor=south east] at ([xshift=-0.6cm, yshift=0.5cm]current page.south east)
+      {\includegraphics[height=1.25cm]{img/logo-esp-lita.png}};
+  \end{tikzpicture}
+\end{frame}
+
+% =====================================================================
+\section{Contexte}
+
+\begin{frame}{Pourquoi ce sujet ?}
+  \begin{columns}[c]
+    \begin{column}{0.55\textwidth}
+      \footnotesize
+      \begin{itemize}
+        \item Un contrat intelligent est un \textbf{programme public, déterministe et immuable} : une faille déployée ne se corrige pas (Ch08).
+        \item \textbf{The DAO} (2016) : une \textbf{réentrance} détourne environ 3,6 M d'ETH. La bifurcation dure qui suit fait naître Ethereum Classic \refcite{atzei2017}.
+        \item Enjeu local : un diplôme de l'ESP vérifié sur une chaîne de blocs (sujet A13) reposerait lui aussi sur des contrats.
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.43\textwidth}
+      \centering
+      \begin{tikzpicture}[>=Stealth, thick, scale=0.9, transform shape]
+        \personne{(0,0)}{espblue}{Alice}
+        \node[draw=espblue, fill=espblue!8, rounded corners, minimum width=1.5cm, minimum height=0.9cm, font=\small] (c) at (2.6,0.2) {Coffre};
+        \personne{(5.9,0)}{espred}{Modou}
+        \draw[->] (0.3,0.2) -- node[above, font=\scriptsize]{10 ETH} (c.west);
+        \draw[->, espred] (5.55,0.42) -- node[above, font=\scriptsize]{retirer()} ([yshift=7pt]c.east);
+        \draw[->, espred] ([yshift=-7pt]c.east) -- node[below, pos=0.42, font=\scriptsize]{1 ETH + rappel} (5.55,0.02);
+        \node[font=\scriptsize, text=espred] at (4.25,-0.95) {$\times$ 10 réentrées};
+      \end{tikzpicture}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Question de recherche}
+  \begin{bloc}{esporange}{Notre question (fiche officielle A11)}
+    Les outils automatiques (Slither, Mythril, Echidna) détectent-ils les vulnérabilités réellement exploitées, et avec quel taux de faux positifs sur des contrats récents (Solidity 0.8) ?
+  \end{bloc}
+  \footnotesize
+  \begin{itemize}
+    \item \textbf{Hypothèse} : les outils sont complémentaires. Leur couverture dépend de la méthode et de la catégorie de faille. Les combiner l'améliore, sans garantir l'absence de faille.
+    \item \textbf{Méthode envisagée} : au moins 20 contrats annotés (Solidity 0.8 en priorité), une matrice de confusion, puis précision, rappel et temps d'analyse, comparés à \refcite{durieux2020}.
+    \item \textbf{Modèle d'attaque} : adversaire actif (Modou). Il déploie son propre contrat, appelle les fonctions publiques et exécute du code à chaque réception d'ETH, sans aucune clé privée d'autrui.
+  \end{itemize}
+\end{frame}
+
+% =====================================================================
+\section{Mécanisme}
+
+\begin{frame}{Principe du mécanisme}
+  \begin{bloc}{espblue}{Analyse automatique d'un contrat}
+    \small \textbf{Entrée} : code Solidity ou bytecode, plus des propriétés pour Echidna. \textbf{Sortie} : des alertes (catégorie, emplacement, gravité) ou un contre-exemple. \textbf{Propriété visée} (réentrance) : l'état est mis à jour \emph{avant} tout appel externe, et la somme des soldes reste au plus égale aux ETH détenus.
+  \end{bloc}
+  \vspace{2pt}
+  \centering
+  \begin{tikzpicture}[>=Stealth, thick, font=\scriptsize,
+      boite/.style={draw=espblue, fill=espblue!6, rounded corners, minimum height=0.62cm, align=center},
+      outil/.style={draw=esporange, fill=esporange!10, rounded corners, minimum width=3.6cm, minimum height=0.52cm, align=center}]
+    \node[boite, minimum width=2.4cm] (src) at (0,0) {contrat \texttt{.sol}\\(+ propriétés)};
+    \node[outil] (sl) at (4.2,0.72) {Slither --- analyse statique};
+    \node[outil] (my) at (4.2,0)    {Mythril --- exécution symbolique};
+    \node[outil] (ec) at (4.2,-0.72){Echidna --- test aléatoire (\emph{fuzzing})};
+    \node[boite, minimum width=2.3cm] (out) at (8.3,0) {alertes /\\contre-exemples};
+    \node[boite, minimum width=2.3cm] (rev) at (11.3,0) {revue manuelle\\VP · FP · FN};
+    \foreach \t in {sl,my,ec} { \draw[->] (src.east) -- (\t.west); \draw[->] (\t.east) -- (out.west); }
+    \draw[->] (out) -- (rev);
+  \end{tikzpicture}
+\end{frame}
+
+\begin{frame}{Exemple déroulé}
+  \begin{bloc}{espgreen}{Calcul pas à pas (mesuré sur le réseau Hardhat local)}
+    \small
+    \begin{enumerate}
+      \item \textbf{Paramètres} : Alice dépose 10 ETH, Modou mise 1 ETH, donc le coffre contient 11 ETH.
+      \item \textbf{Étape 1} : \texttt{retirer()} lit \texttt{montant = 1} et envoie 1 ETH \emph{avant} \texttt{soldes[Modou] = 0}. La fonction \texttt{receive()} de Modou rappelle alors \texttt{retirer()}, et son solde enregistré vaut \emph{toujours} 1.
+      \item \textbf{Étape 2} : chaque réentrée retire 1 ETH. Le coffre passe de 10 à 9, puis 8, et ainsi de suite jusqu'à 0, soit \textbf{10 réentrées}.
+      \item \textbf{Résultat et vérification} : Modou détient 11 ETH (1 + 10), et le coffre est vide. Pourtant, le registre indique encore 10 ETH pour Alice, qui ne peut plus retirer.
+    \end{enumerate}
+  \end{bloc}
+\end{frame}
+
+\begin{frame}{Ce qui peut mal tourner}
+  \begin{bloc}{espred}{Mauvais usage ou attaque connue}
+    \footnotesize
+    \textbf{Réentrance} : appel externe avant la mise à jour de l'état. Solidity 0.8 supprime les dépassements silencieux, \emph{pas} la réentrance. \textbf{Impact} : perte ou gel de fonds, sans retour possible.
+    \vspace{3pt}
+
+    \begin{columns}[T]
+      \begin{column}{0.48\textwidth}
+        \textbf{Taxonomie d'Atzei et al.} \refcite{atzei2017}
+        \begin{itemize}
+          \item dépassement arithmétique (vérifié depuis 0.8, sauf \texttt{unchecked}) ;
+          \item contrôle d'accès (Parity, 2017 : 513\,774 ETH gelés) ;
+          \item dépendance à l'horodatage ;
+          \item exécution anticipée (\emph{front-running}).
+        \end{itemize}
+      \end{column}
+      \begin{column}{0.48\textwidth}
+        \textbf{Du côté des outils}
+        \begin{itemize}
+          \item fausse alerte : motif signalé mais non exploitable ;
+          \item faille manquée : la logique métier leur échappe ;
+          \item risques hors du code (oracles, ponts, clés), invisibles à l'analyse d'un fichier.
+        \end{itemize}
+      \end{column}
+    \end{columns}
+  \end{bloc}
+\end{frame}
+
+% =====================================================================
+\section{État de l'art}
+
+\begin{frame}{Travaux existants}
+  \scriptsize
+  \renewcommand{\arraystretch}{1.15}
+  \begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{2.9cm}>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}p{4.6cm}@{}}
+    \toprule
+    Référence & Apport & Limite \\
+    \midrule
+    Atzei et al., 2017 \refcite{atzei2017} & Taxonomie des attaques sur Ethereum (Solidity, EVM, chaîne de blocs) & Antérieure à Solidity 0.8 ; n'évalue aucun outil \\
+    Tsankov et al., 2018 \refcite{tsankov2018} & Securify : analyse statique par motifs de conformité et de violation & Limité aux propriétés encodées dans ses motifs \\
+    Feist et al., 2019 \refcite{feist2019} & Slither : analyse statique rapide sur une représentation intermédiaire (SlithIR) & Signale des motifs sans prouver leur exploitabilité \\
+    Durieux et al., 2020 \refcite{durieux2020} & 9 outils, 69 contrats annotés : seulement 42\,\% des failles détectées par l'ensemble des outils ; 97\,\% d'environ 47\,500 contrats réels signalés & Contrats antérieurs à Solidity 0.8, d'où un biais face aux contrats récents \\
+    Grieco et al., 2020 \refcite{grieco2020} & Echidna : test aléatoire guidé par des propriétés & Ne trouve que ce que décrivent les propriétés \\
+    \bottomrule
+  \end{tabularx}
+
+  \vspace{4pt}
+  \centering 5 sources primaires, dont les 3 lectures obligatoires (Atzei, Slither, Durieux).
+\end{frame}
+
+\begin{frame}{Positionnement de notre projet}
+  \begin{itemize}
+    \item \textbf{Ce qui n'a pas été étudié} : l'étude de référence \refcite{durieux2020} porte sur des contrats antérieurs à Solidity 0.8. On ignore si ses taux de détection et de faux positifs tiennent pour des contrats récents, où l'arithmétique est vérifiée par défaut.
+    \item \textbf{Notre contribution} : mesurer, sur au moins 20 contrats annotés en priorité Solidity 0.8, ce que Slither, Mythril et Echidna détectent, ratent ou signalent à tort, par catégorie de faille. La vérité terrain est relue par deux membres, et le dépôt est reproductible (scripts, versions et sorties brutes).
+  \end{itemize}
+\end{frame}
+
+% =====================================================================
+\section{Démonstration}
+
+\begin{frame}[fragile]{Démonstration}
+  \begin{columns}[c]
+    \begin{column}{0.47\textwidth}
+\begin{lstlisting}
+// VulnerableVault.sol (coffre du cours)
+function retirer() external {
+  uint montant = soldes[msg.sender];
+  require(montant > 0, "rien a retirer");
+  // (1) envoi AVANT la mise a jour
+  (bool ok, ) =
+      msg.sender.call{value: montant}("");
+  require(ok);
+  // (2) remise a zero trop tard
+  soldes[msg.sender] = 0;
+}
+\end{lstlisting}
+    \end{column}
+    \begin{column}{0.51\textwidth}
+      \footnotesize
+      \begin{itemize}
+        \item \textbf{À observer} : sur le réseau Hardhat local, l'attaquant vide le coffre ; la version corrigée (vérifications--effets--interactions + \texttt{nonReentrant}) résiste ; puis Slither sur les deux coffres.
+        \item \textbf{Résultat obtenu} (10/11/2026, 7 tests sur 7) : coffre vulnérable 11 $\to$ 0 ETH en 10 réentrées ; coffre corrigé : Alice garde ses 10 ETH.
+        \item \textbf{Slither 0.11.6} : \texttt{reentrancy-eth} (impact élevé) sur (1)--(2) ; aucune alerte de réentrance sur le coffre corrigé.
+        \item Vidéo de secours de 2 minutes : [lien à ajouter].
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% =====================================================================
+\section{Conclusion}
+
+\begin{frame}{À retenir}
+  \begin{bloc}{esporange}{À retenir}
+    \begin{itemize}
+      \item La réentrance vient de l'\textbf{ordre des instructions} : il faut mettre à jour l'état \emph{avant} tout appel externe. Solidity 0.8 ne la supprime pas.
+      \item Chaque famille d'outils a un angle mort. Une alerte ne prouve pas que la faille est exploitable, et \textbf{une absence d'alerte ne prouve pas la sécurité}.
+      \item Sur notre coffre, Slither a bien signalé la réentrance réelle. La réponse à la question officielle viendra du corpus d'au moins 20 contrats annotés (résultats à venir).
+    \end{itemize}
+  \end{bloc}
+\end{frame}
+
+\begin{frame}{Questions de quiz}
+  \small
+  Trois questions à choix multiple, remises à J+2 pour la banque de questions du contrôle individuel :
+  \vspace{4pt}
+  \begin{enumerate}
+    \item Quelle modification suffit à empêcher la réentrance dans le coffre du cours ?\\[1pt]
+      {\footnotesize a) compiler en Solidity 0.8 \quad b) remettre le solde à zéro avant l'envoi des fonds\\
+      c) remplacer \texttt{uint} par \texttt{uint256} \quad d) augmenter la limite de gaz}
+    \item Quel outil repose sur l'exécution symbolique ?\\[1pt]
+      {\footnotesize a) Slither \quad b) Echidna \quad c) Mythril \quad d) Hardhat}
+    \item Comment calcule-t-on la précision d'un outil de détection ?\\[1pt]
+      {\footnotesize a) VP / (VP + FN) \quad b) VP / (VP + FP) \quad c) VN / (VN + FP) \quad d) (VP + VN) / total}
+  \end{enumerate}
+  % Réponses (à remettre à J+2, ne pas afficher) : 1 b ; 2 c ; 3 b
+\end{frame}
+
+\begin{frame}{Références}
+  \NoAutoSpacing
+  \vspace*{-4pt}
+  \fontsize{7.6}{8.9}\selectfont
+  \refent{atzei2017}{N.~Atzei, M.~Bartoletti, T.~Cimoli. \emph{A Survey of Attacks on Ethereum Smart Contracts (SoK)}. POST 2017, LNCS 10204. \url{https://doi.org/10.1007/978-3-662-54455-6_8}}
+  \refent{tsankov2018}{P.~Tsankov et al. \emph{Securify: Practical Security Analysis of Smart Contracts}. ACM CCS 2018. \url{https://doi.org/10.1145/3243734.3243780}}
+  \refent{feist2019}{J.~Feist, G.~Grieco, A.~Groce. \emph{Slither: A Static Analysis Framework for Smart Contracts}. WETSEB 2019. \url{https://doi.org/10.1109/WETSEB.2019.00008}}
+  \refent{durieux2020}{T.~Durieux, J.~F.~Ferreira, R.~Abreu, P.~Cruz. \emph{Empirical Review of Automated Analysis Tools on 47,587 Ethereum Smart Contracts}. ICSE 2020. \url{https://arxiv.org/abs/1910.10601}}
+  \refent{grieco2020}{G.~Grieco, W.~Song, A.~Cygan, J.~Feist, A.~Groce. \emph{Echidna: Effective, Usable, and Fast Fuzzing for Smart Contracts}. ISSTA 2020. \url{https://doi.org/10.1145/3395363.3404366}}
+  \refent{smartbugs}{SmartBugs Curated, contrats Solidity vulnérables annotés. \url{https://github.com/smartbugs/smartbugs-curated}}
+  \refent{mendy2026}{G.~Mendy. \emph{Ch08 --- Contrats intelligents, confidentialité et applications}. Cours DIC3, ESP-UCAD / LITA, 2026.}
+\end{frame}
+
+\end{document}
