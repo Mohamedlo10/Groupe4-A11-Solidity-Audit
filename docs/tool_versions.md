@@ -56,6 +56,20 @@ Elle complète la validation manuelle ci-dessus, sans la remplacer (cahier §10.
 | [42866015967](https://github.com/Mohamedlo10/Groupe4-A11-Solidity-Audit/actions/runs/42866015967) | windows-latest | v22.23.4 | ✅ 7 passing | 10/11/2026 |
 | [42866015967](https://github.com/Mohamedlo10/Groupe4-A11-Solidity-Audit/actions/runs/42866015967) | ubuntu-latest | v22.23.4 | ✅ 7 passing | 10/11/2026 |
 
+## Historique Git : correspondance des identifiants
+
+Le 10/11/2026, les messages de commit ont été réécrits. Le contenu des fichiers n'a pas changé : l'arbre Git est identique. Les sorties brutes, qui ne sont jamais modifiées, citent encore les anciens identifiants. Voici la correspondance :
+
+| Ancien | Nouveau | Cité dans |
+|---|---|---|
+| a22c453 | 10ff7cc | — |
+| 17cbc94 | 81c181a | `results/raw/slither/20261110T172915Z/meta.jsonl` |
+| d18a746 | d8e3de3 | — |
+| 4df9032 | 597d508 | — |
+| 995d25b | 4e8be92 | run CI 42866015967 |
+| 32dccde | cd142a3 | run CI 42866363545 |
+| 867539f | 50b7dbd | run CI 42866610032 |
+
 ## Outils d'analyse
 
 | Outil | Version | Méthode d'installation | Date |
