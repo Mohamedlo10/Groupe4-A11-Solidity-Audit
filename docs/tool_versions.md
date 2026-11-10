@@ -58,6 +58,6 @@ npx hardhat test
 | Echidna | — | prévu : Homebrew 2.4.0 | — |
 
 Remarques :
-- `brew install slither-analyzer` a aussi installé **Python 3.15.2** (dépendance Homebrew). Le `python3` du système reste 3.14.6.
+- `brew install slither-analyzer` a aussi installé **Python 3.15.2** (dépendance Homebrew) : depuis, `python3` pointe vers 3.15.2 (avant : 3.14.6, voir le premier diagnostic). Slither tourne dans son propre environnement Homebrew.
 - Slither 0.11.6 analyse le projet Hardhat 3 directement (`slither .`), sans configuration supplémentaire.
 - Le dépôt a été déplacé le 10/11/2026 dans `Cryptographie et technologies blockchain/Groupe4-A11-Solidity-Audit` (le chemin contient des espaces). Les tests et Slither ont été relancés depuis ce nouveau chemin avec succès.

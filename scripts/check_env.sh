@@ -28,7 +28,7 @@ cat > "$OUT" <<EOF
   "brew": "$(v brew --version)",
   "docker": "$(v docker --version)",
   "slither": "$(v slither --version)",
-  "solc_select_current": "$(v solc --version | tail -n 1)",
+  "solc_select_current": "$(if command -v solc >/dev/null 2>&1; then solc --version 2>&1 | tail -n 1; else echo absent; fi)",
   "myth": "$(v myth version)",
   "echidna": "$(v echidna --version)"
 }
