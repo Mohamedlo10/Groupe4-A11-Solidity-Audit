@@ -13,6 +13,7 @@ Dépôt : https://github.com/Mohamedlo10/Groupe4-A11-Solidity-Audit (privé jusq
 | Tests d'acceptation | **7 tests réussis sur 7** via `npx hardhat test` (critères 1 à 7 du cahier des charges §6.3) | `test/reentrancy.test.ts` |
 | Contrôle du test | Une fois la faille corrigée dans le coffre vulnérable, le test d'attaque **échoue** : il détecte donc bien l'absence de réentrance | contrôle fait en séance, fichier restauré |
 | Slither | Slither 0.11.6 installé (Homebrew) et lancé sur le projet et sur les 2 coffres | `results/raw/slither/20261110T172915Z/` |
+| Intégration continue | `npm ci` + `npx hardhat test` réussis sur Windows et Ubuntu (GitHub Actions) | `.github/workflows/test.yml`, run 42866015967 |
 
 ## 2. Résultats observés
 
@@ -44,7 +45,7 @@ Ces deux contrats donnent une première observation sur la catégorie réentranc
 - `npx hardhat --init` est interactif : le projet a été créé à partir du template officiel `node-test-runner-viem` livré avec Hardhat 3.21.2. Le résultat est le même, sans la dépendance git `forge-std`, pénible sous Windows.
 - Le template d'exemple exige solc ≥ 0.8.34. Nous figeons **0.8.28**, mieux pris en charge par les outils d'analyse.
 - Homebrew a installé Python 3.15 avec Slither, et `python3` pointe désormais vers 3.15.2 : c'est noté.
-- Validation sur un **2e système (Windows)** : **pas encore faite**. Elle est prévue avec un coéquipier.
+- Validation sur un **2e système** : l'intégration continue GitHub Actions passe sur **Windows et Ubuntu** (Node 22.23.4, 7 tests réussis, run 42866015967). La validation **manuelle** par le coéquipier sous Windows reste à faire : la CI la complète, elle ne la remplace pas.
 
 ## 5. Prochaines actions (avant l'exposé du vendredi 13/11)
 

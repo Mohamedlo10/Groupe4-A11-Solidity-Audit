@@ -47,6 +47,15 @@ npx hardhat test
 | Résultat de `npx hardhat test` | |
 | Date | |
 
+## Complément : intégration continue GitHub Actions
+
+Elle complète la validation manuelle ci-dessus, sans la remplacer (cahier §10.4).
+
+| Run | Système | Node | `npm ci` + `npx hardhat test` | Date |
+|---|---|---|---|---|
+| [42866015967](https://github.com/Mohamedlo10/Groupe4-A11-Solidity-Audit/actions/runs/42866015967) | windows-latest | v22.23.4 | ✅ 7 passing | 10/11/2026 |
+| [42866015967](https://github.com/Mohamedlo10/Groupe4-A11-Solidity-Audit/actions/runs/42866015967) | ubuntu-latest | v22.23.4 | ✅ 7 passing | 10/11/2026 |
+
 ## Outils d'analyse
 
 | Outil | Version | Méthode d'installation | Date |
